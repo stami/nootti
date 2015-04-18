@@ -17,7 +17,7 @@ module.exports = function(app) {
         next(); // make sure we go to the next routes and don't stop here
     });
 
-    // GET /notes (get titles)
+    // GET /notes (get all)
     app.get('/api/notes', function(req, res, next) {
       Nootti.find(function (err, notes) {
         if (err) return next(err);

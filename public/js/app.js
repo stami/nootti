@@ -1,2 +1,2 @@
 // public/js/app.js
-angular.module('sampleApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'NerdCtrl', 'NoottiService']);
+angular.module('noottiApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'NoottiService']);
