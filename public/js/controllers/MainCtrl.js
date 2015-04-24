@@ -1,25 +1,45 @@
 // public/js/controllers/MainCtrl.js
-angular.module('MainCtrl', ['NoottiService']).controller('MainController', ['$scope', 'Nootti', '$timeout', function($scope, Nootti, $timeout) {
+angular.module('MainCtrl', ['NoottiService'])
+
+.controller('MainController', ['$scope', 'Nootti', '$timeout', '$filter', function($scope, Nootti, $timeout, $filter) {
 
 
 
     $scope.notes = [];
+    $scope.visibleNotes = [];
     // note to show in editing area
 	$scope.current = $scope.notes[0];
+	$scope.current_index = -1;
+	$scope.enableFilter = true;
 
 	// Get data from db
 	// not refresh() because it's async
 	Nootti.get().success(function(data){
 		applyRemoteData(data);
+		$scope.visibleNotes = $scope.notes;
 		// set first titleList item selected
 		// $scope.selectedTitle = $scope.notes[0];
 	});
 
-	$scope.$watch('searchText', function() {
-		// title filter changed, update selected to the first item
-		console.log('watch happend');
-		// $scope.selectedTitle = $scope.notes[0];
+	// Watch searchText input
+	// $scope.$watch('searchText', function() {
+	// 	// console.log('search text changed');
+	// 	// $scope.current_index = -1;
+	// 	$scope.visibleNotes = $scope.notes;
+	// 	$scope.enableFilter = true;
+	// });
+
+	$scope.$watch('current_index', function() {
+		if ($scope.current_index >= 0) {
+			$scope.enableFilter = false;
+			$scope.visibleNotes = $scope.filteredNotes;
+			$scope.searchText = document.getElementsByClassName('titlerow')[$scope.current_index].outerText;
+		}
 	});
+
+	// ngkeyup inputtiin, jos ei nuolinäppäin, resetoi filter
+
+
 
 
 
@@ -53,15 +73,17 @@ angular.module('MainCtrl', ['NoottiService']).controller('MainController', ['$sc
 	
 
 
+	// Called when enter pressed on searchText input
     $scope.searchOrCreate = function() {
 
-    	if ($scope.searchText.length > 2) {
+    	if ($scope.searchText.length > 1) {
 	    	
-	    	var current = getNoteByTitle($scope.searchText);
+	    	// var current = getNoteByTitle($scope.searchText);
+	    		
+    		if (getNoteByTitle($scope.searchText) === null) {
+				// title not found in list, create new note
+	    		console.log('creating new note...');
 
-	    	if (current === null) {
-	    		// note not found, create new
-	    		console.log('creating new note for editing...');
 	    		Nootti.create({
 	    			title: $scope.searchText,
 	    			content: ''
@@ -70,9 +92,9 @@ angular.module('MainCtrl', ['NoottiService']).controller('MainController', ['$sc
 	    			refresh();
 	    			$timeout($scope.searchOrCreate, 50);
 	    		});
-
 	    	} else {
-	    		// note found. open into editing area
+	    		// note found from filtered list
+	    		// open it into editing area
 	    		console.log('opening note "'+ current.title +'" to editing...');
 	    		$scope.current = current;
 	    		$scope.editingArea = current.content;
@@ -90,12 +112,24 @@ angular.module('MainCtrl', ['NoottiService']).controller('MainController', ['$sc
     		});
     };
 
-    $scope.key = function($event){
+    $scope.handleKeyPress = function($event){
 	    console.log($event.keyCode);
-	    if ($event.keyCode == 40) {
-	    	// key down
-	    	document.getElementById("titles").focus();
+	    if ($event.keyCode == 40) { // arrow down
+	    	$scope.current_index++;
 	    }
+	    else if ($event.keyCode == 38) { // arrow up 
+	    	$scope.current_index--;
+	    }
+	    else { // chars are 48-90
+	    	// something written in input (not arrow up or down)
+	    	// reset filtering
+	    	$scope.visibleNotes = $scope.notes;
+			$scope.enableFilter = true;
+			$scope.current_index = -1;
+	    }
+
+	    // update selected list item class
+	    // elem[0].querySelectorAll('.titlerow')[$scope.current_index];
 	};
 
     function applyRemoteData(data) {
@@ -109,14 +143,45 @@ angular.module('MainCtrl', ['NoottiService']).controller('MainController', ['$sc
 		});
     }
 
+    // Search from filtered notes list
     function getNoteByTitle(title) {
-    	for (var i = $scope.notes.length - 1; i >= 0; i--) {
-    		if ($scope.notes[i].title === title) {
-    			return $scope.notes[i];
+    	for (var i = $scope.filteredNotes.length - 1; i >= 0; i--) {
+    		if ($scope.filteredNotes[i].title === title) {
+    			return $scope.filteredNotes[i];
     		}
     	}
     	return null;
     }
 
 
-}]);
+}])
+
+.filter('noteFilter', function () {
+    return function(input, filter, isEnabled) {
+
+
+        // if isEnabled then filter
+        if (isEnabled && filter !== undefined) {
+
+	    	console.log(input);
+	    	console.log(filter);
+	    	console.log(isEnabled);
+
+            var filtered = [];            
+
+            filter = filter.toLowerCase();
+            angular.forEach(input, function(item) {
+                if( item.title.toLowerCase().indexOf(filter) >= 0 )
+                    filtered.push(item);
+            });
+
+            return filtered;
+
+        } 
+        // return with no filtering
+        else{
+          return input;
+        }
+
+    };
+});

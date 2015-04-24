@@ -1,20 +1,26 @@
 <!-- public/views/home.html -->
 
-<div class="jumbotron text-center">
+<div class="jumbotron">
     <h2>Nootti</h2>
     <p>The note taking app.</p>
 
     <form ng-submit="searchOrCreate()">
-        <input class="form-control" ng-model="searchText" placeholder="Search or Create" ng-keydown="key($event)" autofocus>
+        <input class="form-control" ng-model="searchText" placeholder="Search or Create" ng-keyup="handleKeyPress($event)" autofocus>
     </form>
 
-    <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select>
+<!--     <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select> -->
 
-    <textarea ng-model="editingArea" class="form-control" rows="10"></textarea>
+    <ul class="titles">
+        <li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter)" ng-class="{current: $index==current_index}" id="{{ note._id }}">
+            {{ note.title }}
+        </li>
+    </ul>
+
+    <textarea ng-model="editingArea" class="form-control" rows="10" ng-disabled="current_index === -1"></textarea>
 
     <button ng-click="deleteCurrent()">Delete</button>
 
     <p>{{ current }}</p>
-    <p>selectedTitle: {{ selectedTitle }} </p>
+    <p>current_index: {{ current_index }} </p>
 
 </div>
