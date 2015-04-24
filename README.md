@@ -1,7 +1,33 @@
 # Nootti
+>The note taking app.
 
-## API speksit
 
+## Install
+
+Nootti requires Node and MongoDB to be installed.
+
+
+**Install packages and dependencies**
+
+`$ bower install`
+
+and
+
+`$ npm install`
+
+## Usage
+
+Start MongoDB `$ mongod`
+
+Run the app `$ node server.js`
+
+Head to `http://localhost:8080`
+
+
+
+### API specs
+
+Nootti REST api
 
 | Route          | HTTP verb | Description |
 | -----          | --------- | ----------- |

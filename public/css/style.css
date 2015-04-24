@@ -1,0 +1,10 @@
+
+ul.titles {
+    background-color: #fff;
+    list-style: none;
+    border: 1px solid #aaa;
+}
+
+li.current {
+    background-color: #ddd;
+}
