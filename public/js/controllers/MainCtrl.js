@@ -128,6 +128,10 @@ angular.module('MainCtrl', ['NoottiService'])
 	    // elem[0].querySelectorAll('.titlerow')[$scope.current_index];
 	};
 
+    $scope.selectNote = function(index) {
+    	$scope.current_index = index;
+    };
+
     function applyRemoteData(data) {
     	$scope.notes = data;
     }

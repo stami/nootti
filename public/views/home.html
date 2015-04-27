@@ -16,7 +16,7 @@
 
     <!--     <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select> -->
 
-        <ul class="titles"><li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter)" ng-class="{current: $index==current_index}" id="{{ note._id }}">
+        <ul class="titles"><li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter)" ng-class="{current: $index==current_index}" id="{{ note._id }}" ng-click="selectNote($index)">
                 {{ note.title }}
             </li></ul>
 
