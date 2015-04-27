@@ -1,26 +1,42 @@
 <!-- public/views/home.html -->
 
-<div class="jumbotron">
-    <h2>Nootti</h2>
-    <p>The note taking app.</p>
+<div class="bg">
 
-    <form ng-submit="searchOrCreate()">
-        <input class="form-control" ng-model="searchText" placeholder="Search or Create" ng-keyup="handleKeyPress($event)" autofocus>
-    </form>
+    <div class="container">
 
-<!--     <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select> -->
+        <header class="appHeader">
+            <h2>Nootti <small>- The note taking app.</small></h2>
+            
 
-    <ul class="titles">
-        <li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter)" ng-class="{current: $index==current_index}" id="{{ note._id }}">
-            {{ note.title }}
-        </li>
-    </ul>
 
-    <textarea ng-model="editingArea" class="form-control" rows="10" ng-disabled="current_index === -1"></textarea>
+            <form ng-submit="searchOrCreate()">
+                <input type="text" class="form-control" ng-model="searchText" placeholder="Search or Create" ng-keyup="handleKeyPress($event)" autofocus>
+            </form>
+        </header>
+
+    <!--     <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select> -->
+
+        <ul class="titles"><li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter)" ng-class="{current: $index==current_index}" id="{{ note._id }}">
+                {{ note.title }}
+            </li></ul>
+
+        <div class="appBody">
+            <textarea id="editingArea" ng-model="current.content" class="form-control" rows="10" ng-disabled="current === undefined"></textarea>
+
+            <div class="noteFooter">
+                <span class="left">{{ state }}</span>
+                <span class="right">15 words</span>
+                <div class="cf"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <br><br>
 
     <button ng-click="deleteCurrent()">Delete</button>
 
-    <p>{{ current }}</p>
+    <p>current: {{ current.content }}</p>
     <p>current_index: {{ current_index }} </p>
 
 </div>
