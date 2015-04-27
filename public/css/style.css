@@ -1,10 +1,152 @@
+*, *:before {
+    box-sizing: border-box;
+    position: relative;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body > * {
+    height: 100%;
+}
+
+h2 {
+    margin: 0;
+    font-weight: 600;
+}
+h2 small {
+    font-weight: 400;
+}
+
+.bg {
+    height: 100%;
+    padding-top: 50px;
+    background: url(../images/bridge-unsplash.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.cf {
+    clear: both;
+}
+
+.container {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background: inherit;
+    position: relative;
+    border: 1px solid #AEAEAE;
+    border-radius: 5px;
+
+    -webkit-box-shadow: 0px 20px 81px 2px rgba(0,0,0,0.7);
+    -moz-box-shadow: 0px 20px 81px 2px rgba(0,0,0,0.7);
+    box-shadow: 0px 20px 81px 2px rgba(0,0,0,0.7);
+}
+
+.container:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    -webkit-filter: blur(15px) saturate(2);
+}
+
+.appHeader,
+.appBody {
+    background: #EBEBEB;
+}
+.appHeader {
+    padding: 10px;
+    border-radius: 5px 5px 0px 0px;
+}
+.appBody {
+    padding-top: 10px;
+    border-radius: 0px 0px 5px 5px;
+}
+
+input,
+textarea {
+    width: 100%;
+    max-width: 100%;
+}
+
+input[type="text"] {
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    appearance: none;
+    box-shadow: none;
+    margin-top: 10px;
+    border-radius: 5px;
+    padding: 5px 10px 5px 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: border 0.3s;
+}
+input[type="text"]:focus {
+    outline: none;
+    border: 1px solid rgba(0,0,0,0.4);
+}
+
+textarea {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding: 15px;
+    font-size: 14px;
+    max-height: 400px;
+}
+textarea:focus {
+    outline: none;
+}
 
 ul.titles {
-    background-color: #fff;
+    padding: 0;
+    margin: 0;
     list-style: none;
-    border: 1px solid #aaa;
+    max-height: 150px;
+    overflow: auto;
+    font-size: 14px;
+
+    border-top: 1px solid #CBCBCB;
+    border-bottom: 1px solid #CBCBCB;
+}
+ul.titles:empty {
+    border: none;
+}
+
+.titles li {
+    background: rgba(255,255,255,0.7);
+    padding: 3px 0px 3px 15px;
 }
 
 li.current {
-    background-color: #ddd;
+    background: rgba(255,255,255,0.5);
+    font-weight: 600;
+}
+
+.noteFooter {
+    width: 100%;
+    padding: 0px 15px 5px 15px;
+}
+.noteFooter span {
+    display: inline-block;
+    font-size: 12px;
+    color: #555;
+}
+.noteFooter .left {
+    float: left;
+}
+.noteFooter .right {
+    float: right;
 }
