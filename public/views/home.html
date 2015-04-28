@@ -2,23 +2,22 @@
 
 <div class="bg">
 
-    <div class="container">
+    <div class="container blur">
 
         <header class="appHeader">
             <h2>Nootti <small>- The note taking app.</small></h2>
-            
-
 
             <form ng-submit="searchOrCreate()">
                 <input type="text" class="form-control" ng-model="searchText" placeholder="Search or Create" ng-keyup="handleKeyPress($event)" id="searchText" autofocus>
             </form>
         </header>
 
-    <!--     <select id="titles" size="5" class="form-control" ng-model="selectedTitle" ng-options="note.title for note in notes | filter:searchText"></select> -->
-
         <ul class="titles"><li class="titlerow" ng-repeat="note in filteredNotes = (visibleNotes | noteFilter:searchText:enableFilter | orderBy : ['ranking', '-updated_at'])" ng-class="{current: $index==current_index}" id="{{ note._id }}" ng-click="selectNote($index)">
                 <span class="title">
                     {{ note.title }}
+                </span>
+                <span class="preview">
+                    {{ note.content | limitTo : 45 }} {{ note.content.length > 45 ? "..." : "" }}
                 </span>
                 <span class="date">
                     {{ note.updated_at | date : 'dd.MM.yyyy hh.mm.ss' }}
@@ -39,10 +38,5 @@
         </div>
 
     </div>
-
-    <br><br>
-
-    <p>current: {{ current.content }}</p>
-    <p>current_index: {{ current_index }} </p>
 
 </div>

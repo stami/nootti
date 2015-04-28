@@ -127,8 +127,9 @@ ul.titles:empty {
 
 .titles li {
     background: rgba(255,255,255,0.7);
-    padding: 3px 15px 3px 15px;
+    padding: 0px 15px 0px 15px;
     cursor: default;
+    line-height: 25px;
 }
 
 li.current {
@@ -138,6 +139,14 @@ li.current {
 
 li .title {
     float: left;
+}
+li .preview {
+    /*float: left;*/
+    font-size: 12px;
+    line-height: 16px;
+    vertical-align: text-bottom;
+    color: rgba(0,0,0,0.5);
+    padding-left: 1em;
 }
 li .date {
     float: right;
