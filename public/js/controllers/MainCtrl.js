@@ -3,12 +3,12 @@ angular.module('MainCtrl', ['NoottiService'])
 
 .controller('MainController', ['$scope', 'Nootti', '$timeout', '$filter', function($scope, Nootti, $timeout, $filter) {
 
-    $scope.notes = [];
-    $scope.visibleNotes = [];
-	$scope.current = undefined;
-	$scope.current_index = -1;
-	$scope.enableFilter = true;
-	$scope.state = '';
+	$scope.notes         = []; 	 // holds all notes from database
+	$scope.visibleNotes  = [];	 // notes currently visible (filtered)
+	$scope.current       = undefined; // current note object
+	$scope.current_index = -1;	 // current index in listing (visible)
+	$scope.enableFilter  = true; // flag indicating wheter or not list should be filtered by searchText input
+	$scope.state         = 'note not selected'; // normally saved/saving
 
 	// First get data from db
 	Nootti.get().success(function(data){
@@ -16,21 +16,19 @@ angular.module('MainCtrl', ['NoottiService'])
 		$scope.visibleNotes = $scope.notes;
 	});
 
-	// Watch searchText input
-	// $scope.$watch('searchText', function() {
-	// 	// console.log('search text changed');
-	// 	// $scope.current_index = -1;
-	// 	$scope.visibleNotes = $scope.notes;
-	// 	$scope.enableFilter = true;
-	// });
 
 	$scope.$watch('current_index', function() {
 		if ($scope.current_index >= 0) {
-			$scope.enableFilter = false;
+			$scope.enableFilter = false; // disable filtering when moving with arrows
 			$scope.visibleNotes = $scope.filteredNotes;
 			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].outerText.trim();
-			$scope.current = $scope.visibleNotes[$scope.current_index];
-			document.getElementsByClassName('title')[$scope.current_index].scrollIntoView(false);
+			$scope.current = getNoteByTitle($scope.searchText);
+			document.getElementsByClassName('titlerow')[$scope.current_index].scrollIntoView(false);
+			// console.log('notes :');
+			// console.log($scope.notes);
+			// console.log('visible notes :');
+			// console.log($scope.visibleNotes);
+
 		}
 	});
 
@@ -80,9 +78,8 @@ angular.module('MainCtrl', ['NoottiService'])
 	    			content: ''
 	    		}).success(function(data) {
 	    			console.log(data);
-	    			$scope.current = data; // set just created note editable
-	    			refresh(resetVisible);
-			    	document.getElementById('editingArea').focus();
+	    			refresh($scope.searchOrCreate);
+			    	// document.getElementById('editingArea').focus();
 	    		});
 	    	} else {
 	    		// note found from filtered list
@@ -102,7 +99,7 @@ angular.module('MainCtrl', ['NoottiService'])
     			console.log('deleted note "'+ data.title +'"');
     			$scope.searchText = '';
     			$scope.current = undefined;
-    			refresh(resetVisible);
+    			refresh();
     		});
     };
 
@@ -118,46 +115,46 @@ angular.module('MainCtrl', ['NoottiService'])
 	    		$scope.current_index--;
 	    	}
 	    }
-	    else if ($event.keyCode === 13) {}
+	    else if ($event.keyCode === 13) {} // enter: ignore, ng-submit takes care of this
 	    else { // chars are 48-90
-	    	// something written in input (not arrow up or down)
+	    	// something written in input (not arrows or enter)
 	    	// reset filtering
 	    	$scope.visibleNotes = $scope.notes;
 			$scope.enableFilter = true;
 			$scope.current_index = -1;
 	    }
-
-	    // update selected list item class
-	    // elem[0].querySelectorAll('.titlerow')[$scope.current_index];
 	};
 
     $scope.selectNote = function(index) {
     	$scope.current_index = index;
+    	document.getElementById('searchText').focus();
     };
 
+    // count of words in text
     $scope.countOf = function(text) {
 	    var s = text ? text.split(/\s+/) : 0; // splits the text on space/tab/enter
 	    return s ? s.length : 0;
 	};
 
-
     function applyRemoteData(data) {
     	$scope.notes = data;
-    }
-
-    function refresh(doafter) {
-	    Nootti.get().success(function(data){
-			applyRemoteData(data);
-			if (doafter !== undefined) {
-				doafter();
-			}
-		});
     }
 
     function resetVisible() {
     	$scope.visibleNotes = $scope.notes;
     	$scope.current_index = -1;
     	document.getElementById('searchText').focus();
+    }
+
+    function refresh(doafter) {
+	    Nootti.get().success(function(data){
+			applyRemoteData(data);
+			resetVisible();
+			
+			if (doafter !== undefined) {
+				doafter();
+			}
+		});
     }
 
     function setState(state) {
@@ -182,13 +179,22 @@ angular.module('MainCtrl', ['NoottiService'])
 
 
         // if isEnabled then filter
-        if (isEnabled && filter !== undefined) {
+        if (isEnabled) {
 
 	    	// console.log(input);
 	    	// console.log(filter);
 	    	// console.log(isEnabled);
 
-            var filtered = [];            
+            var filtered = [];  
+
+            // if filter not given, rank results in original order
+	    	if (filter === undefined) {
+	    		for (var i=0; i<input.length; i++) {
+	    			input[i].ranking = i;
+	    			filtered.push(input[i]);
+	    		}
+	    		return filtered;
+	    	}
 
             filter = filter.toLowerCase(); // case insensitive
 
@@ -199,10 +205,11 @@ angular.module('MainCtrl', ['NoottiService'])
             		// filter text found
             		
             		// how many extra chars there are
-            		var extraChars = current.title.length - filter.length;
+            		var before = index;
+            		var after = current.title.length - (index + filter.length);
 
             		// let's rank items by it
-            		current.ranking = extraChars;
+            		current.ranking = before*2 + after;
 
                     filtered.push(current);
             	}
