@@ -28,7 +28,7 @@ angular.module('MainCtrl', ['NoottiService'])
 		if ($scope.current_index >= 0) {
 			$scope.enableFilter = false;
 			$scope.visibleNotes = $scope.filteredNotes;
-			$scope.searchText = document.getElementsByClassName('titlerow')[$scope.current_index].outerText;
+			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].outerText.trim();
 			$scope.current = $scope.visibleNotes[$scope.current_index];
 		}
 	});
@@ -80,30 +80,28 @@ angular.module('MainCtrl', ['NoottiService'])
 	    		}).success(function(data) {
 	    			console.log(data);
 	    			$scope.current = data; // set just created note editable
-	    			refresh();
-	    			// $timeout($scope.searchOrCreate, 50);
+	    			refresh(resetVisible);
+			    	document.getElementById('editingArea').focus();
 	    		});
 	    	} else {
 	    		// note found from filtered list
 	    		// open it into editing area
 	    		$scope.current = getNoteByTitle($scope.searchText);
+		    	document.getElementById('editingArea').focus();
 	    		console.log('open note "'+ $scope.current.title +'" to editing...');
-	    	}
 
-	    	// set focus to editingArea
-	    	document.getElementById('editingArea').focus();
-	    	
+	    	}	    	
 	    }
 
     };
 
     $scope.deleteCurrent = function() {
     	Nootti.delete($scope.current._id)
-    		.success(function() {
-    			console.log('deleted note successfully');
+    		.success(function(data) {
+    			console.log('deleted note "'+ data.title +'"');
     			$scope.searchText = '';
-    			refresh();
-    			resetVisible();
+    			$scope.current = undefined;
+    			refresh(resetVisible);
     		});
     };
 
@@ -136,15 +134,19 @@ angular.module('MainCtrl', ['NoottiService'])
     	$scope.notes = data;
     }
 
-    function refresh() {
-	    // get all notes from db
+    function refresh(doafter) {
 	    Nootti.get().success(function(data){
 			applyRemoteData(data);
+			if (doafter !== undefined) {
+				doafter();
+			}
 		});
     }
 
     function resetVisible() {
     	$scope.visibleNotes = $scope.notes;
+    	$scope.current_index = -1;
+    	document.getElementById('searchText').focus();
     }
 
     function setState(state) {
@@ -177,11 +179,23 @@ angular.module('MainCtrl', ['NoottiService'])
 
             var filtered = [];            
 
-            filter = filter.toLowerCase();
-            angular.forEach(input, function(item) {
-                if( item.title.toLowerCase().indexOf(filter) >= 0 )
-                    filtered.push(item);
-            });
+            filter = filter.toLowerCase(); // case insensitive
+
+            for (var i=0; i<input.length; i++) {
+            	var current = input[i];
+            	var index = current.title.toLowerCase().indexOf(filter);
+            	if( index >= 0 ) {
+            		// filter text found
+            		
+            		// how many extra chars there are
+            		var extraChars = current.title.length - filter.length;
+
+            		// let's rank items by it
+            		current.ranking = extraChars;
+
+                    filtered.push(current);
+            	}
+            }
 
             return filtered;
 
