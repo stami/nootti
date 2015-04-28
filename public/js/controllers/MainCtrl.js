@@ -108,10 +108,14 @@ angular.module('MainCtrl', ['NoottiService'])
     $scope.handleKeyPress = function($event){
 	    console.log($event.keyCode);
 	    if ($event.keyCode == 40) { // arrow down
-	    	$scope.current_index++;
+	    	if ($scope.current_index < $scope.visibleNotes.length - 1) {
+	    		$scope.current_index++;
+	    	}
 	    }
 	    else if ($event.keyCode == 38) { // arrow up 
-	    	$scope.current_index--;
+	    	if ($scope.current_index > 0) {
+	    		$scope.current_index--;
+	    	}
 	    }
 	    else if ($event.keyCode === 13) {}
 	    else { // chars are 48-90
