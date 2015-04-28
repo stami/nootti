@@ -20,6 +20,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	$scope.$watch('current_index', function() {
 		if ($scope.current_index >= 0) {
 			$scope.enableFilter = false; // disable filtering when moving with arrows
+			enableAutoSave = false;
 			$scope.visibleNotes = $scope.filteredNotes;
 			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].outerText.trim();
 			$scope.current = getNoteByTitle($scope.searchText);
@@ -35,11 +36,13 @@ angular.module('MainCtrl', ['NoottiService'])
 
 	// =========== Auto Save ================================
 
+	// prevent saving when note open but not changed
+	var enableAutoSave = false;
+
     var saveUpdates = function() {
     	setState('saving');
     	console.log('updating note!!');
     	$scope.current.updated_at = new Date();
-    	console.log($scope.current);
     	Nootti.update($scope.current).success(function(){
     		setState('saved');
     	});
@@ -48,7 +51,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	var timeout = null;
 
 	var debounceUpdate = function(newVal, oldVal) {
-		if (newVal != oldVal) {
+		if (newVal != oldVal && enableAutoSave) {
 			if (timeout) {
 				$timeout.cancel(timeout);
 			}
@@ -59,16 +62,13 @@ angular.module('MainCtrl', ['NoottiService'])
 	$scope.$watch('current.content', debounceUpdate);
 
 	// =========== Auto Save end =============================
-	
 
 
 	// Called when enter pressed on searchText input
     $scope.searchOrCreate = function() {
 
     	if ($scope.searchText.length > 1) {
-	    	
-	    	// var current = getNoteByTitle($scope.searchText);
-	    		
+
     		if (getNoteByTitle($scope.searchText) === null) {
 				// title not found in list, create new note
 	    		console.log('creating new note...');
@@ -88,7 +88,7 @@ angular.module('MainCtrl', ['NoottiService'])
 		    	document.getElementById('editingArea').focus();
 	    		console.log('open note "'+ $scope.current.title +'" to editing...');
 
-	    	}	    	
+	    	}
 	    }
 
     };
@@ -104,13 +104,13 @@ angular.module('MainCtrl', ['NoottiService'])
     };
 
     $scope.handleKeyPress = function($event){
-	    console.log($event.keyCode);
+	    // console.log($event.keyCode);
 	    if ($event.keyCode == 40) { // arrow down
 	    	if ($scope.current_index < $scope.visibleNotes.length - 1) {
 	    		$scope.current_index++;
 	    	}
 	    }
-	    else if ($event.keyCode == 38) { // arrow up 
+	    else if ($event.keyCode == 38) { // arrow up
 	    	if ($scope.current_index > 0) {
 	    		$scope.current_index--;
 	    	}
@@ -123,6 +123,11 @@ angular.module('MainCtrl', ['NoottiService'])
 			$scope.enableFilter = true;
 			$scope.current_index = -1;
 	    }
+	};
+
+	// called at onKeyUp() on editingArea
+	$scope.enableAutoSave = function() {
+		enableAutoSave = true;
 	};
 
     $scope.selectNote = function(index) {
@@ -150,7 +155,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	    Nootti.get().success(function(data){
 			applyRemoteData(data);
 			resetVisible();
-			
+
 			if (doafter !== undefined) {
 				doafter();
 			}
@@ -185,7 +190,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	    	// console.log(filter);
 	    	// console.log(isEnabled);
 
-            var filtered = [];  
+            var filtered = [];
 
             // if filter not given, rank results in original order
 	    	if (filter === undefined) {
@@ -203,7 +208,7 @@ angular.module('MainCtrl', ['NoottiService'])
             	var index = current.title.toLowerCase().indexOf(filter);
             	if( index >= 0 ) {
             		// filter text found
-            		
+
             		// how many extra chars there are
             		var before = index;
             		var after = current.title.length - (index + filter.length);
@@ -217,7 +222,7 @@ angular.module('MainCtrl', ['NoottiService'])
 
             return filtered;
 
-        } 
+        }
         // return with no filtering
         else{
           return input;

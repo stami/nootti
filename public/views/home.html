@@ -26,7 +26,7 @@
             </li></ul>
 
         <div class="appBody">
-            <textarea id="editingArea" ng-model="current.content" class="form-control" rows="10" ng-disabled="current === undefined"></textarea>
+            <textarea id="editingArea" ng-model="current.content" class="form-control" rows="10" ng-disabled="current === undefined" ng-keyup="enableAutoSave()"></textarea>
 
             <div class="noteFooter">
                 <span class="left" ng-hide="current_index === -1">&nbsp;{{ state }}</span>
