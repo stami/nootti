@@ -30,6 +30,7 @@ angular.module('MainCtrl', ['NoottiService'])
 			$scope.visibleNotes = $scope.filteredNotes;
 			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].outerText.trim();
 			$scope.current = $scope.visibleNotes[$scope.current_index];
+			document.getElementsByClassName('title')[$scope.current_index].scrollIntoView(false);
 		}
 	});
 
