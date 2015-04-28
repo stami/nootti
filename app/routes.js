@@ -19,7 +19,7 @@ module.exports = function(app) {
 
     // GET /notes (get all)
     app.get('/api/notes', function(req, res, next) {
-      Nootti.find(function (err, notes) {
+      Nootti.find(null, null, { sort: { updated_at: -1 } }, function (err, notes) {
         if (err) return next(err);
         res.json(notes);
       });
