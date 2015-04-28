@@ -135,6 +135,12 @@ angular.module('MainCtrl', ['NoottiService'])
     	$scope.current_index = index;
     };
 
+    $scope.countOf = function(text) {
+	    var s = text ? text.split(/\s+/) : 0; // splits the text on space/tab/enter
+	    return s ? s.length : 0;
+	};
+
+
     function applyRemoteData(data) {
     	$scope.notes = data;
     }

@@ -141,11 +141,12 @@ li .title {
 }
 li .date {
     float: right;
+    font-size: 12px;
 }
 
 .noteFooter {
     width: 100%;
-    padding: 0px 15px 5px 15px;
+    padding: 0px 15px 0px 15px;
 }
 .noteFooter span {
     display: inline-block;
@@ -166,13 +167,10 @@ li .date {
     float: right;
 }
 
-/*.aligncenter {
-    float: left;
-    text-align:center;
-    width:33.33333%;
+a.delete {
+    color: #B6261E;
+    text-decoration: none;
 }
-.alignright {
-    float: left;
-    text-align:right;
-    width:33.33333%;
-}*/
+a.delete:hover {
+    font-weight: 600;
+}
