@@ -8,7 +8,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	$scope.current       = undefined; // current note object
 	$scope.current_index = -1;	 // current index in listing (visible)
 	$scope.enableFilter  = true; // flag indicating wheter or not list should be filtered by searchText input
-	$scope.state         = 'note not selected'; // normally saved/saving
+	$scope.state         = '';   // used to display a little 'saving' -text in ui
 
 	// First get data from db
 	Nootti.get().success(function(data){
@@ -40,11 +40,11 @@ angular.module('MainCtrl', ['NoottiService'])
 	var enableAutoSave = false;
 
     var saveUpdates = function() {
-    	setState('saving');
     	console.log('updating note!!');
     	$scope.current.updated_at = new Date();
     	Nootti.update($scope.current).success(function(){
-    		setState('saved');
+    		$scope.state = 'saved';
+    		$timeout(function(){ $scope.state = ''; }, 500);
     	});
     };
 
@@ -160,10 +160,6 @@ angular.module('MainCtrl', ['NoottiService'])
 				doafter();
 			}
 		});
-    }
-
-    function setState(state) {
-    	$scope.state = state;
     }
 
     // Search from filtered notes list
