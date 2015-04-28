@@ -85,6 +85,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	    		// note found from filtered list
 	    		// open it into editing area
 	    		$scope.current = getNoteByTitle($scope.searchText);
+	    		$scope.current_index = 0; // when title is written, the note is first in list
 		    	document.getElementById('editingArea').focus();
 	    		console.log('open note "'+ $scope.current.title +'" to editing...');
 
