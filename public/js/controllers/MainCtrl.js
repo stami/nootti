@@ -201,16 +201,24 @@ angular.module('MainCtrl', ['NoottiService'])
 
             for (var i=0; i<input.length; i++) {
             	var current = input[i];
-            	var index = current.title.toLowerCase().indexOf(filter);
-            	if( index >= 0 ) {
-            		// filter text found
+            	var index = current.title.toLowerCase().indexOf(filter); // filter found in title
+            	var contentIndex = current.content.toLowerCase().indexOf(filter); // filter found in content
 
-            		// how many extra chars there are
-            		var before = index;
-            		var after = current.title.length - (index + filter.length);
+            	if( index >= 0 || contentIndex >= 0 ) {
 
-            		// let's rank items by it
-            		current.ranking = before*2 + after;
+            		// found in title
+            		if (index >= 0) {
+	            		// how many extra chars there are in title
+	            		var before = index;
+	            		var after = current.title.length - (index + filter.length);
+
+	            		// let's rank items by it
+	            		current.ranking = before*2 + after;
+	            	}
+	            	// found in content, rank last
+	            	else {
+	            		current.ranking = current.title.length;
+	            	}
 
                     filtered.push(current);
             	}
