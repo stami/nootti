@@ -6,7 +6,7 @@ angular.module('MainCtrl', ['NoottiService'])
 	$scope.notes         = []; 	 // holds all notes from database
 	$scope.visibleNotes  = [];	 // notes currently visible (filtered)
 	$scope.current       = undefined; // current note object
-	$scope.current_index = -1;	 // current index in listing (visible)
+	$scope.current_index = -1;	 // current index in listing
 	$scope.enableFilter  = true; // flag indicating wheter or not list should be filtered by searchText input
 	$scope.state         = '';   // used to display a little 'saving' -text in ui
 
@@ -20,16 +20,11 @@ angular.module('MainCtrl', ['NoottiService'])
 	$scope.$watch('current_index', function() {
 		if ($scope.current_index >= 0) {
 			$scope.enableFilter = false; // disable filtering when moving with arrows
-			enableAutoSave = false;
+			enableAutoSave = false;      // disable autosave to prevent saving when just opening
 			$scope.visibleNotes = $scope.filteredNotes;
-			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].innerHTML.trim();
+			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].innerHTML.trim(); // set current title to searchText-input
 			$scope.current = getNoteByTitle($scope.searchText);
-			document.getElementsByClassName('titlerow')[$scope.current_index].scrollIntoView(false);
-			// console.log('notes :');
-			// console.log($scope.notes);
-			// console.log('visible notes :');
-			// console.log($scope.visibleNotes);
-
+			document.getElementsByClassName('titlerow')[$scope.current_index].scrollIntoView(false); // scroll the list when moving down out of sight
 		}
 	});
 
@@ -78,8 +73,9 @@ angular.module('MainCtrl', ['NoottiService'])
 	    			content: ''
 	    		}).success(function(data) {
 	    			console.log(data);
+	    			// refresh the data from database
+	    			// call self after refreshing (it goes to 'else' part)
 	    			refresh($scope.searchOrCreate);
-			    	// document.getElementById('editingArea').focus();
 	    		});
 	    	} else {
 	    		// note found from filtered list
@@ -87,8 +83,8 @@ angular.module('MainCtrl', ['NoottiService'])
 	    		$scope.current = getNoteByTitle($scope.searchText);
 		    	document.getElementById('editingArea').focus();
 	    		console.log('open note "'+ $scope.current.title +'" to editing...');
-
 	    	}
+
 	    }
 
     };
@@ -103,26 +99,34 @@ angular.module('MainCtrl', ['NoottiService'])
     		});
     };
 
+    // called from ng-keyup="" in searchText-input
     $scope.handleKeyPress = function($event){
-	    // console.log($event.keyCode);
-	    if ($event.keyCode == 40) { // arrow down
-	    	if ($scope.current_index < $scope.visibleNotes.length - 1) {
-	    		$scope.current_index++;
-	    	}
-	    }
-	    else if ($event.keyCode == 38) { // arrow up
-	    	if ($scope.current_index > 0) {
-	    		$scope.current_index--;
-	    	}
-	    }
-	    else if ($event.keyCode === 13) {} // enter: ignore, ng-submit takes care of this
-	    else { // chars are 48-90
-	    	// something written in input (not arrows or enter)
-	    	// reset filtering
-	    	$scope.visibleNotes = $scope.notes;
-			$scope.enableFilter = true;
-			$scope.current_index = -1;
-	    }
+
+    	switch ($event.keyCode) {
+
+    		case 40: // arrow down
+    			if ($scope.current_index < $scope.visibleNotes.length - 1) {
+		    		$scope.current_index++;
+		    	}
+		    	break;
+
+		    case 38: // arrow up
+    			if ($scope.current_index > 0) {
+		    		$scope.current_index--;
+		    	}
+		    	break;
+
+		    case 13: // enter
+		    	break;
+
+		    default:
+		    	// something written in input (not arrows or enter)
+		    	// reset filtering
+		    	$scope.visibleNotes = $scope.notes;
+				$scope.enableFilter = true;
+				$scope.current_index = -1;
+
+    	}
 	};
 
 	// called at onKeyUp() on editingArea
@@ -130,9 +134,10 @@ angular.module('MainCtrl', ['NoottiService'])
 		enableAutoSave = true;
 	};
 
+	// called when user clicks a note from list (ng-click on <li>)
     $scope.selectNote = function(index) {
     	$scope.current_index = index;
-    	document.getElementById('searchText').focus();
+    	document.getElementById('searchText').focus(); // set focus to searchText to enable arrow navigating
     };
 
     // count of words in text
@@ -151,6 +156,8 @@ angular.module('MainCtrl', ['NoottiService'])
     	document.getElementById('searchText').focus();
     }
 
+    // get all notes from database
+    // parameter 'doafter' is called after successful db query
     function refresh(doafter) {
 	    Nootti.get().success(function(data){
 			applyRemoteData(data);
@@ -162,7 +169,7 @@ angular.module('MainCtrl', ['NoottiService'])
 		});
     }
 
-    // Search from filtered notes list
+    // returns note object by its title
     function getNoteByTitle(title) {
     	for (var i = $scope.visibleNotes.length - 1; i >= 0; i--) {
     		if ($scope.visibleNotes[i].title === title) {
@@ -172,25 +179,20 @@ angular.module('MainCtrl', ['NoottiService'])
     	return null;
     }
 
-
 }])
 
 .filter('noteFilter', function () {
     return function(input, filter, isEnabled) {
 
-
         // if isEnabled then filter
         if (isEnabled) {
 
-	    	// console.log(input);
-	    	// console.log(filter);
-	    	// console.log(isEnabled);
-
             var filtered = [];
+            var i = 0;
 
-            // if filter not given, rank results in original order
+            // if filter not given, 'rank' results in original order
 	    	if (filter === undefined) {
-	    		for (var i=0; i<input.length; i++) {
+	    		for (i=0; i<input.length; i++) {
 	    			input[i].ranking = i;
 	    			filtered.push(input[i]);
 	    		}
@@ -199,7 +201,7 @@ angular.module('MainCtrl', ['NoottiService'])
 
             filter = filter.toLowerCase(); // case insensitive
 
-            for (var i=0; i<input.length; i++) {
+            for (i=0; i<input.length; i++) {
             	var current = input[i];
             	var index = current.title.toLowerCase().indexOf(filter); // filter found in title
             	var contentIndex = current.content.toLowerCase().indexOf(filter); // filter found in content
@@ -227,7 +229,7 @@ angular.module('MainCtrl', ['NoottiService'])
             return filtered;
 
         }
-        // return with no filtering
+        // return original input
         else{
           return input;
         }

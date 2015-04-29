@@ -32,7 +32,7 @@ Nootti REST api
 
 | Route          | HTTP verb | Description |
 | -----          | --------- | ----------- |
-| /api/notes     | GET  | Get all titles |
+| /api/notes     | GET  | Get all sorted by updated_at |
 | /api/notes     | POST | Create new note |
 | /api/notes/:id | GET  | Get all data of a note |
 | /api/notes/:id | PUT  | Update note (auto save) |
