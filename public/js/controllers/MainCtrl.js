@@ -22,7 +22,7 @@ angular.module('MainCtrl', ['NoottiService'])
 			$scope.enableFilter = false; // disable filtering when moving with arrows
 			enableAutoSave = false;
 			$scope.visibleNotes = $scope.filteredNotes;
-			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].outerText.trim();
+			$scope.searchText = document.getElementsByClassName('title')[$scope.current_index].innerHTML.trim();
 			$scope.current = getNoteByTitle($scope.searchText);
 			document.getElementsByClassName('titlerow')[$scope.current_index].scrollIntoView(false);
 			// console.log('notes :');
