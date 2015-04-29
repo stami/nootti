@@ -1,6 +1,7 @@
 # Nootti
 >The note taking app.
 
+![screenshot](screenshot.png)
 
 ## Install
 
